@@ -5,6 +5,10 @@
 static const CGFloat kMargin = 16;
 static const CGFloat kPanoViewHeight = 250;
 
+@interface PanoramaViewController ()<GCSWidgetViewDelegate>
+
+@end
+
 @implementation PanoramaViewController {
   GCSPanoramaView *_panoView;
   UIScrollView *_scrollView;
@@ -41,6 +45,7 @@ static const CGFloat kPanoViewHeight = 250;
   [_scrollView addSubview:_preambleLabel];
 
   _panoView = [[GCSPanoramaView alloc] init];
+  _panoView.delegate = self;
   _panoView.enableFullscreenButton = YES;
   _panoView.enableCardboardButton = YES;
   [_panoView loadImage:[UIImage imageNamed:@"andes.jpg"]
@@ -108,6 +113,12 @@ static const CGFloat kPanoViewHeight = 250;
 
   _scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.view.bounds),
                                        CGRectGetMaxY(_attributionTextView.frame) + kMargin);
+}
+
+#pragma mark - GCSWidgetViewDelegate
+
+- (void)widgetView:(GCSWidgetView *)widgetView didLoadContent:(id)content {
+  NSLog(@"Loaded panorama image");
 }
 
 #pragma mark - Implementation

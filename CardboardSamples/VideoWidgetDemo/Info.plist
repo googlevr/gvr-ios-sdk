@@ -43,5 +43,7 @@
 	</array>
 	<key>UIStatusBarHidden</key>
 	<true/>
+	<key>UIMainStoryboardFile</key>
+	<string>Main</string>
 </dict>
 </plist>

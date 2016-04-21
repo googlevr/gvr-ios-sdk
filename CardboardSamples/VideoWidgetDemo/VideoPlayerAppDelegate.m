@@ -10,12 +10,6 @@
 
 - (BOOL)application:(UIApplication *)application
     didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-  UIViewController *viewController = [[VideoPlayerViewController alloc] init];
-  viewController = [[UINavigationController alloc] initWithRootViewController:viewController];
-
-  self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-  self.window.rootViewController = viewController;
-  [self.window makeKeyAndVisible];
   return YES;
 }
 

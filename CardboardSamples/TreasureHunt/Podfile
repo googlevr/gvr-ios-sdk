@@ -1,1 +1,9 @@
-pod 'CardboardSDK'
+platform :ios, '7.0'
+use_frameworks!
+
+target 'TreasureHunt' do
+	pod 'CardboardSDK'
+end
+
+
+

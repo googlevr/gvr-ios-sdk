@@ -1,4 +1,4 @@
-# Cardboard iOS SDK
+# Google VR SDK for iOS
 =====================
 Copyright (c) 2016 Google Inc.  All rights reserved.
 

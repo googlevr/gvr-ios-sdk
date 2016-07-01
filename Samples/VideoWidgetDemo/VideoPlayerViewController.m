@@ -38,8 +38,10 @@
 
   _isPaused = NO;
 
+  // Load the sample 360 video, which is of type stereo-over-under.
   NSString *videoPath = [[NSBundle mainBundle] pathForResource:@"congo" ofType:@"mp4"];
-  [_videoView loadFromUrl:[[NSURL alloc] initFileURLWithPath:videoPath]];
+  [_videoView loadFromUrl:[[NSURL alloc] initFileURLWithPath:videoPath]
+                   ofType:kGVRVideoTypeStereoOverUnder];
 }
 
 #pragma mark - GVRVideoViewDelegate

@@ -13,7 +13,6 @@
 		1237A4E51C81357500AD3514 /* andes.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 1237A4E41C81357500AD3514 /* andes.jpg */; };
 		1237A4E91C81369E00AD3514 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1237A4E61C81369E00AD3514 /* Assets.xcassets */; };
 		1237A4EA1C81369E00AD3514 /* launch.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1237A4E71C81369E00AD3514 /* launch.xib */; };
-		1237A4EB1C81369E00AD3514 /* Panorama-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1237A4E81C81369E00AD3514 /* Panorama-Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -137,7 +136,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				1237A4E91C81369E00AD3514 /* Assets.xcassets in Resources */,
-				1237A4EB1C81369E00AD3514 /* Panorama-Info.plist in Resources */,
 				1237A4EA1C81369E00AD3514 /* launch.xib in Resources */,
 				1237A4E51C81357500AD3514 /* andes.jpg in Resources */,
 			);

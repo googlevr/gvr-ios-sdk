@@ -35,6 +35,7 @@
   _videoView.delegate = self;
   _videoView.enableFullscreenButton = YES;
   _videoView.enableCardboardButton = YES;
+  _videoView.enableTouchTracking = YES;
 
   _isPaused = NO;
 

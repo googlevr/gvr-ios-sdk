@@ -48,6 +48,7 @@ static const CGFloat kPanoViewHeight = 250;
   _panoView.delegate = self;
   _panoView.enableFullscreenButton = YES;
   _panoView.enableCardboardButton = YES;
+  _panoView.enableTouchTracking = YES;
   [_panoView loadImage:[UIImage imageNamed:@"andes.jpg"]
                 ofType:kGVRPanoramaImageTypeStereoOverUnder];
   [_scrollView addSubview:_panoView];

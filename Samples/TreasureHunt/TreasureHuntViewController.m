@@ -47,6 +47,10 @@
   _renderLoop = nil;
 }
 
+- (GVRCardboardView *)getCardboardView {
+  return _cardboardView;
+}
+
 #pragma mark - TreasureHuntRendererDelegate
 
 - (void)shouldPauseRenderLoop:(BOOL)pause {

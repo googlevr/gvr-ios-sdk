@@ -305,8 +305,9 @@ static const float kMaxCubeElevationRadians = 0.25f * M_PI;
 // Cube focus angle threshold in radians.
 static const float kFocusThresholdRadians = 0.5f;
 
-// Sample sound file name.
-static const NSString *kSampleFilename = @"noise_sample.wav";
+// Sample sound file names.
+static const NSString *kObjectSoundFile = @"cube_sound.wav";
+static const NSString *kSuccessSoundFile = @"success.wav";
 
 static GLuint LoadShader(GLenum type, const char *shader_src) {
   GLint compiled = 0;
@@ -392,6 +393,7 @@ static bool checkProgramLinkStatus(GLuint shader_program) {
 
   GVRAudioEngine *_gvr_audio_engine;
   int _sound_object_id;
+  int _success_source_id;
   bool _is_cube_focused;
 }
 
@@ -503,14 +505,15 @@ static bool checkProgramLinkStatus(GLuint shader_program) {
   // Initialize GVRCardboardAudio engine.
   _gvr_audio_engine =
       [[GVRAudioEngine alloc] initWithRenderingMode:kRenderingModeBinauralHighQuality];
-  [_gvr_audio_engine preloadSoundFile:kSampleFilename];
+  [_gvr_audio_engine preloadSoundFile:kObjectSoundFile];
+  [_gvr_audio_engine preloadSoundFile:kSuccessSoundFile];
   [_gvr_audio_engine start];
 
   // Generate seed for random number generation.
   srand48(time(0));
 
   // Spawn the first cube.
-  _sound_object_id = [_gvr_audio_engine createSoundObject:kSampleFilename];
+  _sound_object_id = [_gvr_audio_engine createSoundObject:kObjectSoundFile];
 
   [self spawnCube];
 }
@@ -587,6 +590,7 @@ static bool checkProgramLinkStatus(GLuint shader_program) {
   glEnableVertexAttribArray(_cube_vertex_attrib);
   glDrawArrays(GL_TRIANGLES, 0, NUM_CUBE_VERTICES / 3);
   glDisableVertexAttribArray(_cube_vertex_attrib);
+  glDisableVertexAttribArray(_cube_color_attrib);
 
   // Select our shader.
   glUseProgram(_grid_program);
@@ -609,6 +613,7 @@ static bool checkProgramLinkStatus(GLuint shader_program) {
   glEnableVertexAttribArray(_grid_vertex_attrib);
   glDrawArrays(GL_TRIANGLES, 0, NUM_GRID_VERTICES / 3);
   glDisableVertexAttribArray(_grid_vertex_attrib);
+  glDisableVertexAttribArray(_grid_color_attrib);
 }
 
 - (void)cardboardView:(GVRCardboardView *)cardboardView
@@ -624,6 +629,8 @@ static bool checkProgramLinkStatus(GLuint shader_program) {
       NSLog(@"User performed trigger action");
       // Check whether the object is found.
       if (_is_cube_focused) {
+         _success_source_id = [_gvr_audio_engine createStereoSound:kSuccessSoundFile];
+        [_gvr_audio_engine playSound:_success_source_id loopingEnabled:false];
         // Vibrate the device on success.
         AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
         // Generate the next cube.

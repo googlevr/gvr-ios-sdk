@@ -95,6 +95,11 @@ static const CGFloat kPanoViewHeight = 250;
   _attributionTextView.attributedText = attributedText;
   _attributionTextView.font = [UIFont systemFontOfSize:16];
   [_scrollView addSubview:_attributionTextView];
+  [_scrollView setAccessibilityIdentifier:@"sample_scroll_view"];
+}
+
+- (GVRPanoramaView *)getPanoramaView {
+  return _panoView;
 }
 
 - (void)viewWillLayoutSubviews {

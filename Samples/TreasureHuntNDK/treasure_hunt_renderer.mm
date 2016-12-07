@@ -73,7 +73,7 @@ static const char* kLightVertexShader =
     "  vec3 lightVector = normalize(u_LightPos - modelViewVertex);\n"
     "  float diffuse = max(dot(modelViewNormal, lightVector), 0.5);\n"
     "  diffuse = diffuse * (1.0 / (1.0 + (0.00001 * distance * distance)));\n"
-    "  v_Color = a_Color * diffuse;\n"
+    "  v_Color = vec4(a_Color.rgb * diffuse, a_Color.a);\n"
     "  gl_Position = u_MVP * a_Position;\n"
     "}\n";
 

@@ -644,6 +644,11 @@ static bool checkProgramLinkStatus(GLuint shader_program) {
   if ([self.delegate respondsToSelector:@selector(shouldPauseRenderLoop:)]) {
     [self.delegate shouldPauseRenderLoop:pause];
   }
+  if (pause) {
+    [_gvr_audio_engine pauseSound:_sound_object_id];
+  } else {
+    [_gvr_audio_engine resumeSound:_sound_object_id];
+  }
 }
 
 // Spawns the next cube at a new position.

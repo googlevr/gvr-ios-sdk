@@ -37,19 +37,25 @@
   _videoView.enableCardboardButton = YES;
   _videoView.enableTouchTracking = YES;
 
-  _isPaused = NO;
+  _isPaused = YES;
 
   // Load the sample 360 video, which is of type stereo-over-under.
   NSString *videoPath = [[NSBundle mainBundle] pathForResource:@"congo" ofType:@"mp4"];
   [_videoView loadFromUrl:[[NSURL alloc] initFileURLWithPath:videoPath]
                    ofType:kGVRVideoTypeStereoOverUnder];
+
+  // Alternatively, this is how to load a video from a URL:
+  //NSURL *videoURL = [NSURL URLWithString:@"https://raw.githubusercontent.com/googlevr/gvr-ios-sdk"
+  //                                       @"/master/Samples/VideoWidgetDemo/resources/congo.mp4"];
+  //[_videoView loadFromUrl:videoURL ofType:kGVRVideoTypeStereoOverUnder];
+
 }
 
 #pragma mark - GVRVideoViewDelegate
 
 - (void)widgetViewDidTap:(GVRWidgetView *)widgetView {
   if (_isPaused) {
-    [_videoView resume];
+    [_videoView play];
   } else {
     [_videoView pause];
   }
@@ -58,6 +64,8 @@
 
 - (void)widgetView:(GVRWidgetView *)widgetView didLoadContent:(id)content {
   NSLog(@"Finished loading video");
+  [_videoView play];
+  _isPaused = NO;
 }
 
 - (void)widgetView:(GVRWidgetView *)widgetView
@@ -70,7 +78,7 @@
   // Loop the video when it reaches the end.
   if (position == videoView.duration) {
     [_videoView seekTo:0];
-    [_videoView resume];
+    [_videoView play];
   }
 }
 

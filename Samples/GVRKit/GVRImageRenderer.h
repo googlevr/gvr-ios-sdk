@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,15 @@
  * limitations under the License.
  */
 
-#import <UIKit/UIKit.h>
+#import "GVRTextureRenderer.h"
 
-@interface TreasureHuntViewController : UIViewController
+/** Defines a texture renderer for images. */
+@interface GVRImageRenderer : GVRTextureRenderer
+
+/** Initialize texture renderer from given image. */
+- (instancetype)initWithImage:(UIImage *)image;
+
+/** Initialize texture renderer from an image from the given path. */
+- (instancetype)initWithContentsOfFile:(NSString *)path;
 
 @end

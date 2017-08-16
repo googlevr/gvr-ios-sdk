@@ -17,7 +17,6 @@
 #import <QuartzCore/QuartzCore.h>
 
 #import "GVRAudioEngine.h"
-#import "GVRHeadTransform.h"
 
 // Vertex shader implementation.
 static const char *kVertexShaderString =
@@ -362,6 +361,14 @@ static bool checkProgramLinkStatus(GLuint shader_program) {
   return true;
 }
 
+static void CheckGLError(const char *label) {
+  int gl_error = glGetError();
+  if (gl_error != GL_NO_ERROR) {
+    NSLog(@"GL error %s: %d", label, gl_error);
+  }
+  assert(glGetError() == GL_NO_ERROR);
+}
+
 @implementation TreasureHuntRenderer {
   // GL variables for the cube.
   GLfloat _cube_vertices[NUM_CUBE_VERTICES];
@@ -397,10 +404,14 @@ static bool checkProgramLinkStatus(GLuint shader_program) {
   bool _is_cube_focused;
 }
 
-#pragma mark - GVRCardboardViewDelegate overrides
+- (void)dealloc {
+  [_gvr_audio_engine stopSound:_sound_object_id];
+  [_gvr_audio_engine stop];
+}
 
-- (void)cardboardView:(GVRCardboardView *)cardboardView
-     willStartDrawing:(GVRHeadTransform *)headTransform {
+- (void)initializeGl {
+  [super initializeGl];
+
   // Renderer must be created on GL thread before any call to drawFrame.
   // Load the vertex/fragment shaders.
   const GLuint vertex_shader = LoadShader(GL_VERTEX_SHADER, kVertexShaderString);
@@ -516,13 +527,20 @@ static bool checkProgramLinkStatus(GLuint shader_program) {
   _sound_object_id = [_gvr_audio_engine createSoundObject:kObjectSoundFile];
 
   [self spawnCube];
+  CheckGLError("init");
 }
 
-- (void)cardboardView:(GVRCardboardView *)cardboardView
-     prepareDrawFrame:(GVRHeadTransform *)headTransform {
+- (void)clearGl {
+  [_gvr_audio_engine stopSound:_sound_object_id];
+  [_gvr_audio_engine stop];
+
+  [super clearGl];
+}
+
+- (void)update:(GVRHeadPose *)headPose {
   // Update audio listener's head rotation.
   const GLKQuaternion head_rotation =
-      GLKQuaternionMakeWithMatrix4(GLKMatrix4Transpose([headTransform headPoseInStartSpace]));
+      GLKQuaternionMakeWithMatrix4(GLKMatrix4Transpose([headPose headTransform]));
   [_gvr_audio_engine setHeadRotation:head_rotation.q[0]
                                    y:head_rotation.q[1]
                                    z:head_rotation.q[2]
@@ -538,23 +556,24 @@ static bool checkProgramLinkStatus(GLuint shader_program) {
   // Clear GL viewport.
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glEnable(GL_DEPTH_TEST);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glEnable(GL_SCISSOR_TEST);
+  CheckGLError("update");
 }
 
-- (void)cardboardView:(GVRCardboardView *)cardboardView
-              drawEye:(GVREye)eye
-    withHeadTransform:(GVRHeadTransform *)headTransform {
-  CGRect viewport = [headTransform viewportForEye:eye];
+- (void)draw:(GVRHeadPose *)headPose {
+  CGRect viewport = [headPose viewport];
   glViewport(viewport.origin.x, viewport.origin.y, viewport.size.width, viewport.size.height);
   glScissor(viewport.origin.x, viewport.origin.y, viewport.size.width, viewport.size.height);
 
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  CheckGLError("glClear");
+
   // Get the head matrix.
-  const GLKMatrix4 head_from_start_matrix = [headTransform headPoseInStartSpace];
+  const GLKMatrix4 head_from_start_matrix = [headPose headTransform];
 
   // Get this eye's matrices.
-  GLKMatrix4 projection_matrix = [headTransform projectionMatrixForEye:eye near:0.1f far:100.0f];
-  GLKMatrix4 eye_from_head_matrix = [headTransform eyeFromHeadMatrix:eye];
+  GLKMatrix4 projection_matrix = [headPose projectionMatrixWithNear:0.1f far:100.0f];
+  GLKMatrix4 eye_from_head_matrix = [headPose eyeTransform];
 
   // Compute the model view projection matrix.
   GLKMatrix4 model_view_projection_matrix = GLKMatrix4Multiply(
@@ -562,11 +581,13 @@ static bool checkProgramLinkStatus(GLuint shader_program) {
 
   // Render from this eye.
   [self renderWithModelViewProjectionMatrix:model_view_projection_matrix.m];
+  CheckGLError("render");
 }
 
 - (void)renderWithModelViewProjectionMatrix:(const float *)model_view_matrix {
   // Select our shader.
   glUseProgram(_cube_program);
+  CheckGLError("glUseProgram");
 
   // Set the uniform values that will be used by our shader.
   glUniform3fv(_cube_position_uniform, 1, _cube_position);
@@ -580,6 +601,7 @@ static bool checkProgramLinkStatus(GLuint shader_program) {
   } else {
     glBindBuffer(GL_ARRAY_BUFFER, _cube_color_buffer);
   }
+  CheckGLError("glBindBuffer");
   glVertexAttribPointer(_cube_color_attrib, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4, 0);
   glEnableVertexAttribArray(_cube_color_attrib);
 
@@ -591,6 +613,7 @@ static bool checkProgramLinkStatus(GLuint shader_program) {
   glDrawArrays(GL_TRIANGLES, 0, NUM_CUBE_VERTICES / 3);
   glDisableVertexAttribArray(_cube_vertex_attrib);
   glDisableVertexAttribArray(_cube_color_attrib);
+  CheckGLError("glDrawArrays");
 
   // Select our shader.
   glUseProgram(_grid_program);
@@ -616,34 +639,22 @@ static bool checkProgramLinkStatus(GLuint shader_program) {
   glDisableVertexAttribArray(_grid_color_attrib);
 }
 
-- (void)cardboardView:(GVRCardboardView *)cardboardView
-         didFireEvent:(GVRUserEvent)event {
-  switch (event) {
-    case kGVRUserEventBackButton:
-      NSLog(@"User pressed back button");
-      break;
-    case kGVRUserEventTilt:
-      NSLog(@"User performed tilt action");
-      break;
-    case kGVRUserEventTrigger:
-      NSLog(@"User performed trigger action");
-      // Check whether the object is found.
-      if (_is_cube_focused) {
-         _success_source_id = [_gvr_audio_engine createStereoSound:kSuccessSoundFile];
-        [_gvr_audio_engine playSound:_success_source_id loopingEnabled:false];
-        // Vibrate the device on success.
-        AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
-        // Generate the next cube.
-        [self spawnCube];
-      }
-      break;
+- (void)handleTrigger {
+  NSLog(@"User performed trigger action");
+  // Check whether the object is found.
+  if (_is_cube_focused) {
+     _success_source_id = [_gvr_audio_engine createStereoSound:kSuccessSoundFile];
+    [_gvr_audio_engine playSound:_success_source_id loopingEnabled:false];
+    // Vibrate the device on success.
+    AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+    // Generate the next cube.
+    [self spawnCube];
   }
 }
 
-- (void)cardboardView:(GVRCardboardView *)cardboardView shouldPauseDrawing:(BOOL)pause {
-  if ([self.delegate respondsToSelector:@selector(shouldPauseRenderLoop:)]) {
-    [self.delegate shouldPauseRenderLoop:pause];
-  }
+- (void)pause:(BOOL)pause {
+  [super pause:pause];
+
   if (pause) {
     [_gvr_audio_engine pauseSound:_sound_object_id];
   } else {

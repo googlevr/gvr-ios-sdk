@@ -1,10 +1,6 @@
-#import "GVRCardboardView.h"
+#import <GVRKit/GVRRenderer.h>
 
-@class StarsRenderLoop;
-
-/** Cardboard Stars renderer. */
-@interface StarsRenderer : NSObject<GVRCardboardViewDelegate>
-
-@property(nonatomic, weak) StarsRenderLoop *renderLoop;
+/** Stars renderer. */
+@interface StarsRenderer : GVRRenderer
 
 @end

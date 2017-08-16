@@ -4,16 +4,6 @@
 
 #import "StarsRenderer.h"
 
-#import "StarsRenderLoop.h"
-
-#import <GLKit/GLKit.h>
-#import <OpenGLES/EAGL.h>
-#import <OpenGLES/ES2/gl.h>
-#import <OpenGLES/ES2/glext.h>
-#import <QuartzCore/QuartzCore.h>
-
-#import "GVRHeadTransform.h"
-
 #define VERTEX_COUNT 200000
 
 typedef NS_ENUM(NSUInteger, EngineMode) {
@@ -149,80 +139,10 @@ static GLuint LoadShader(GLenum type, const char *shader_src) {
   GLuint _vertex_buffer;
 }
 
-#pragma mark - GVRCardboardViewDelegate overrides
+#pragma mark - GVRRenderer overrides
 
-- (void)cardboardView:(GVRCardboardView *)cardboardView
-     prepareDrawFrame:(GVRHeadTransform *)headTransform {
-  NSTimeInterval timestep = _renderLoop.nextFrameTime - _last_timestamp;
-  if (timestep > 1.0) {
-    timestep = 1.0;
-  }
-  _last_timestamp = _renderLoop.nextFrameTime;
-
-  // Accelerate when our engines are on and we're not in warp mode.
-  if (_engine_mode == EngineModeImpulse || _engine_mode == EngineModeToWarp) {
-    float thrust_vector[3];
-    thrust_vector[0] = 0.0f;
-    thrust_vector[1] = 0.0f;
-    thrust_vector[2] = 0.02 * (1.0 + 1000.f * _warp_factor) * timestep;
-    GLKMatrix4 headPoseInStartSpace = GLKMatrix4Transpose([headTransform headPoseInStartSpace]);
-    float *head_matrix = headPoseInStartSpace.m;
-    _offset_velocity[0] += thrust_vector[0] * head_matrix[0] +
-        thrust_vector[1] * head_matrix[4] +
-        thrust_vector[2] * head_matrix[8];
-    _offset_velocity[1] += thrust_vector[0] * head_matrix[1] +
-        thrust_vector[1] * head_matrix[5] +
-        thrust_vector[2] * head_matrix[9];
-    _offset_velocity[2] += thrust_vector[0] * head_matrix[2] +
-        thrust_vector[1] * head_matrix[6] +
-        thrust_vector[2] * head_matrix[10];
-  }
-
-  // Slow down if we're not in warp.
-  if (_engine_mode != EngineModeWarp) {
-    float speed = sqrt(
-        _offset_velocity[0] * _offset_velocity[0] +
-        _offset_velocity[1] * _offset_velocity[1] +
-        _offset_velocity[2] * _offset_velocity[2]);
-    float max_speed = .07f + 5.0f * _warp_factor;
-    const float drag = 0.995f * (max_speed / fmax(speed, max_speed));
-    _offset_velocity[0] *= drag;
-    _offset_velocity[1] *= drag;
-    _offset_velocity[2] *= drag;
-  }
-  _offset_position[0] += _offset_velocity[0];
-  _offset_position[1] += _offset_velocity[1];
-  _offset_position[2] += _offset_velocity[2];
-  _offset_position[0] = fmod(_offset_position[0], 200.0f);
-  _offset_position[1] = fmod(_offset_position[1], 200.0f);
-  _offset_position[2] = fmod(_offset_position[2], 200.0f);
-
-  // Adjust our warp factor if needed.
-  if (_engine_mode == EngineModeToWarp) {
-    _warp_factor += 0.01f;
-    if (_warp_factor >= 1.0) {
-      _warp_factor = 1.0f;
-      _engine_mode = EngineModeWarp;
-    }
-  } else if (_engine_mode == EngineModeToImpulse) {
-    _warp_factor -= 0.01f;
-    if (_warp_factor <= 0.0) {
-      _warp_factor = 0.0f;
-      _engine_mode = EngineModeImpulse;
-    }
-  }
-
-  glDisable(GL_DEPTH_TEST);
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_ONE, GL_ONE);
-  glDisable(GL_SCISSOR_TEST);
-  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT);
-  glEnable(GL_SCISSOR_TEST);
-}
-
-- (void)cardboardView:(GVRCardboardView *)cardboardView
-     willStartDrawing:(GVRHeadTransform *)headTransform {
+- (void)initializeGl {
+  [super initializeGl];
   // Renderer must be created on GL thread before any call to drawFrame.
   // Load the vertex/fragment shaders.
   const GLuint vertex_shader = LoadShader(GL_VERTEX_SHADER, kVertexShaderString);
@@ -306,19 +226,86 @@ static GLuint LoadShader(GLenum type, const char *shader_src) {
   glBufferData(GL_ARRAY_BUFFER, sizeof(_vertices), _vertices, GL_STATIC_DRAW);
 }
 
-- (void)cardboardView:(GVRCardboardView *)cardboardView
-              drawEye:(GVREye)eye
-    withHeadTransform:(GVRHeadTransform *)headTransform {
-  CGRect viewport = [headTransform viewportForEye:eye];
+- (void)update:(GVRHeadPose *)headPose {
+  NSTimeInterval timestep = headPose.nextFrameTime - _last_timestamp;
+  if (timestep > 1.0) {
+    timestep = 1.0;
+  }
+  _last_timestamp = headPose.nextFrameTime;
+
+  // Accelerate when our engines are on and we're not in warp mode.
+  if (_engine_mode == EngineModeImpulse || _engine_mode == EngineModeToWarp) {
+    float thrust_vector[3];
+    thrust_vector[0] = 0.0f;
+    thrust_vector[1] = 0.0f;
+    thrust_vector[2] = 0.02 * (1.0 + 1000.f * _warp_factor) * timestep;
+    GLKMatrix4 headPoseInStartSpace = GLKMatrix4Transpose([headPose headTransform]);
+    float *head_matrix = headPoseInStartSpace.m;
+    _offset_velocity[0] += thrust_vector[0] * head_matrix[0] +
+        thrust_vector[1] * head_matrix[4] +
+        thrust_vector[2] * head_matrix[8];
+    _offset_velocity[1] += thrust_vector[0] * head_matrix[1] +
+        thrust_vector[1] * head_matrix[5] +
+        thrust_vector[2] * head_matrix[9];
+    _offset_velocity[2] += thrust_vector[0] * head_matrix[2] +
+        thrust_vector[1] * head_matrix[6] +
+        thrust_vector[2] * head_matrix[10];
+  }
+
+  // Slow down if we're not in warp.
+  if (_engine_mode != EngineModeWarp) {
+    float speed = sqrt(
+        _offset_velocity[0] * _offset_velocity[0] +
+        _offset_velocity[1] * _offset_velocity[1] +
+        _offset_velocity[2] * _offset_velocity[2]);
+    float max_speed = .07f + 5.0f * _warp_factor;
+    const float drag = 0.995f * (max_speed / fmax(speed, max_speed));
+    _offset_velocity[0] *= drag;
+    _offset_velocity[1] *= drag;
+    _offset_velocity[2] *= drag;
+  }
+  _offset_position[0] += _offset_velocity[0];
+  _offset_position[1] += _offset_velocity[1];
+  _offset_position[2] += _offset_velocity[2];
+  _offset_position[0] = fmod(_offset_position[0], 200.0f);
+  _offset_position[1] = fmod(_offset_position[1], 200.0f);
+  _offset_position[2] = fmod(_offset_position[2], 200.0f);
+
+  // Adjust our warp factor if needed.
+  if (_engine_mode == EngineModeToWarp) {
+    _warp_factor += 0.01f;
+    if (_warp_factor >= 1.0) {
+      _warp_factor = 1.0f;
+      _engine_mode = EngineModeWarp;
+    }
+  } else if (_engine_mode == EngineModeToImpulse) {
+    _warp_factor -= 0.01f;
+    if (_warp_factor <= 0.0) {
+      _warp_factor = 0.0f;
+      _engine_mode = EngineModeImpulse;
+    }
+  }
+
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+  glDisable(GL_DEPTH_TEST);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_ONE, GL_ONE);
+  glEnable(GL_SCISSOR_TEST);
+}
+
+- (void)draw:(GVRHeadPose *)headPose {
+  CGRect viewport = [headPose viewport];
   glViewport(viewport.origin.x, viewport.origin.y, viewport.size.width, viewport.size.height);
   glScissor(viewport.origin.x, viewport.origin.y, viewport.size.width, viewport.size.height);
 
+  glClear(GL_COLOR_BUFFER_BIT);
+
   // Get the head matrix.
-  const GLKMatrix4 head_from_start_matrix = [headTransform headPoseInStartSpace];
+  const GLKMatrix4 head_from_start_matrix = [headPose headTransform];
 
   // Get this eye's matrices.
-  GLKMatrix4 projection_matrix = [headTransform projectionMatrixForEye:eye near:0.1f far:100.0f];
-  GLKMatrix4 eye_from_head_matrix = [headTransform eyeFromHeadMatrix:eye];
+  GLKMatrix4 projection_matrix = [headPose projectionMatrixWithNear:0.1f far:100.0f];
+  GLKMatrix4 eye_from_head_matrix = [headPose eyeTransform];
 
   // Render from this eye.
   [self renderWithProjectionMatrix:projection_matrix.m
@@ -360,32 +347,18 @@ static GLuint LoadShader(GLenum type, const char *shader_src) {
   glDisableVertexAttribArray(_attrib_color);
 }
 
-- (void)cardboardView:(GVRCardboardView *)cardboardView
-         didFireEvent:(GVRUserEvent)event {
-  switch(event) {
-    case kGVRUserEventBackButton:
-      NSLog(@"User pressed back button");
+- (BOOL)handleTrigger {
+  switch (_engine_mode) {
+    case EngineModeImpulse:
+    case EngineModeToImpulse:
+      _engine_mode = EngineModeToWarp;
       break;
-    case kGVRUserEventTilt:
-      NSLog(@"User performed tilt action");
-      break;
-    case kGVRUserEventTrigger:
-      switch (_engine_mode) {
-        case EngineModeImpulse:
-        case EngineModeToImpulse:
-          _engine_mode = EngineModeToWarp;
-          break;
 
-        default:
-          _engine_mode = EngineModeToImpulse;
-          break;
-      }
+    default:
+      _engine_mode = EngineModeToImpulse;
       break;
   }
-}
-
-- (void)cardboardView:(GVRCardboardView *)cardboardView shouldPauseDrawing:(BOOL)pause {
-  _renderLoop.paused = pause;
+  return YES;
 }
 
 @end

@@ -1,5 +1,6 @@
+#import <GVRKit/GVRKit.h>
 #import <UIKit/UIKit.h>
 
-@interface StarsViewController : UIViewController
+@interface StarsViewController : GVRRendererViewController
 
 @end

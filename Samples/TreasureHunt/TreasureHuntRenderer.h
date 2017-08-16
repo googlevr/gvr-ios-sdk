@@ -1,18 +1,9 @@
-#import "GVRCardboardView.h"
-
-/** TreasureHunt renderer delegate. */
-@protocol TreasureHuntRendererDelegate <NSObject>
-@optional
-
-/** Called to pause the render loop because a 2D UI is overlaid on top of the renderer. */
-- (void)shouldPauseRenderLoop:(BOOL)pause;
-
-@end
+#import <GVRKit/GVRRenderer.h>
 
 /** TreasureHunt renderer. */
-@interface TreasureHuntRenderer : NSObject<GVRCardboardViewDelegate>
+@interface TreasureHuntRenderer : GVRRenderer
 
-@property(nonatomic, weak) id<TreasureHuntRendererDelegate> delegate;
+- (void)handleTrigger;
 
 @end
 

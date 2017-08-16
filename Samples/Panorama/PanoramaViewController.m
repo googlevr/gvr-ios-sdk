@@ -1,16 +1,18 @@
 #import "PanoramaViewController.h"
 
-#import "GVRPanoramaView.h"
+#import "GVROverlayView.h"
+#import <GVRKit/GVRKit.h>
+
+#import <AVKit/AVKit.h>
 
 static const CGFloat kMargin = 16;
 static const CGFloat kPanoViewHeight = 250;
 
-@interface PanoramaViewController ()<GVRWidgetViewDelegate>
-
+@interface PanoramaViewController ()<GVRRendererViewControllerDelegate>
+@property(nonatomic) GVRRendererView *panoView;
 @end
 
 @implementation PanoramaViewController {
-  GVRPanoramaView *_panoView;
   UIScrollView *_scrollView;
   UILabel *_titleLabel;
   UILabel *_subtitleLabel;
@@ -44,14 +46,11 @@ static const CGFloat kPanoViewHeight = 250;
                                @"Mountains in Peru, above the Urubamba River valley."];
   [_scrollView addSubview:_preambleLabel];
 
-  _panoView = [[GVRPanoramaView alloc] init];
-  _panoView.delegate = self;
-  _panoView.enableFullscreenButton = YES;
-  _panoView.enableCardboardButton = YES;
-  _panoView.enableTouchTracking = YES;
-  [_panoView loadImage:[UIImage imageNamed:@"andes.jpg"]
-                ofType:kGVRPanoramaImageTypeStereoOverUnder];
+  GVRRendererViewController *viewController = [[GVRRendererViewController alloc] init];
+  viewController.delegate = self;
+  _panoView = viewController.rendererView;
   [_scrollView addSubview:_panoView];
+  [self addChildViewController:viewController];
 
   _captionLabel = [self createLabelWithFontSize:14 text:@"A 360 panoramic view of Machu Picchu"];
   _captionLabel.textColor = [UIColor darkGrayColor];
@@ -98,10 +97,6 @@ static const CGFloat kPanoViewHeight = 250;
   [_scrollView setAccessibilityIdentifier:@"sample_scroll_view"];
 }
 
-- (GVRPanoramaView *)getPanoramaView {
-  return _panoView;
-}
-
 - (void)viewWillLayoutSubviews {
   [super viewWillLayoutSubviews];
 
@@ -121,10 +116,27 @@ static const CGFloat kPanoViewHeight = 250;
                                        CGRectGetMaxY(_attributionTextView.frame) + kMargin);
 }
 
-#pragma mark - GVRWidgetViewDelegate
+#pragma mark - GVRRendererViewControllerDelegate
 
-- (void)widgetView:(GVRWidgetView *)widgetView didLoadContent:(id)content {
-  NSLog(@"Loaded panorama image");
+- (GVRRenderer *)rendererForDisplayMode:(GVRDisplayMode)displayMode {
+  UIImage *image = [UIImage imageNamed:@"andes.jpg"];
+  GVRImageRenderer *imageRenderer = [[GVRImageRenderer alloc] initWithImage:image];
+  [imageRenderer setSphericalMeshOfRadius:50
+                                latitudes:12
+                               longitudes:24
+                              verticalFov:180
+                            horizontalFov:360
+                                 meshType:kGVRMeshTypeStereoTopBottom];
+
+  GVRSceneRenderer *sceneRenderer = [[GVRSceneRenderer alloc] init];
+  [sceneRenderer.renderList addRenderObject:imageRenderer];
+
+  // Hide reticle in embedded display mode.
+  if (displayMode == kGVRDisplayModeEmbedded) {
+    sceneRenderer.hidesReticle = YES;
+  }
+
+  return sceneRenderer;
 }
 
 #pragma mark - Implementation

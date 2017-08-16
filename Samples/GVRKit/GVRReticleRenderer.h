@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-#import <UIKit/UIKit.h>
+#import "GVRSceneRenderer.h"
 
-@interface TreasureHuntViewController : UIViewController
+/** Defines a renderer for a reticle draw at the center for display. */
+@interface GVRReticleRenderer : NSObject<GVRRenderObject>
+
+/** The depth at which to draw the reticle. */
+@property(nonatomic) CGFloat depth;
 
 @end

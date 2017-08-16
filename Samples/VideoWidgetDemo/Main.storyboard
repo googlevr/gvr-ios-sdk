@@ -1,8 +1,11 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11201" systemVersion="15G1004" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="NO" initialViewController="ucw-jQ-RGE">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12120" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="ucw-jQ-RGE">
+    <device id="retina4_0" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
     <dependencies>
-        <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11161"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12088"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
         <!--Video-->
@@ -19,7 +22,6 @@
                         <subviews>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="xSQ-Rm-Amy">
                                 <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
-                                <accessibility key="accessibilityConfiguration" identifier="sample_scroll_view"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hSa-1o-yF1" userLabel="Content View">
                                         <rect key="frame" x="0.0" y="0.0" width="600" height="1020"/>
@@ -34,7 +36,7 @@
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="The great apes from Central Africa" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IdK-dO-gJH">
                                                 <rect key="frame" x="16" y="40" width="568" height="17"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                                <color key="textColor" red="0.33333333333333331" green="0.33333333333333331" blue="0.33333333333333331" alpha="1" colorSpace="calibratedRGB"/>
+                                                <color key="textColor" red="0.33333333333333331" green="0.33333333333333331" blue="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="1000" verticalCompressionResistancePriority="1000" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oSt-NH-4YG">
@@ -49,14 +51,29 @@ The 360 video below shows gorillas in the Congo rainforest.</string>
                                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
-                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ipc-WR-9VX" customClass="GVRVideoView">
+                                            <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="RaR-xf-zE8">
                                                 <rect key="frame" x="16" y="164" width="568" height="250"/>
+                                                <connections>
+                                                    <segue destination="4Si-nm-I01" kind="embed" id="7KD-0j-sGu"/>
+                                                </connections>
+                                            </containerView>
+                                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="I4v-0O-4th">
+                                                <rect key="frame" x="16" y="414" width="568" height="44"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                                <items/>
+                                            </toolbar>
+                                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="Source: Wikipedia" translatesAutoresizingMaskIntoConstraints="NO" id="2qL-VB-ErL">
+                                                <rect key="frame" x="16" y="741" width="568" height="36"/>
+                                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <constraints>
-                                                    <constraint firstAttribute="height" constant="250" id="Oiz-g9-GnN"/>
+                                                    <constraint firstAttribute="height" constant="36" id="CGM-od-gzA"/>
                                                 </constraints>
-                                            </view>
+                                                <color key="textColor" red="0.42467236518859863" green="0.42467236518859863" blue="0.42467236518859863" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                            </textView>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="1000" verticalCompressionResistancePriority="1000" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Vrx-Kb-p6w">
-                                                <rect key="frame" x="16" y="422" width="568" height="311"/>
+                                                <rect key="frame" x="16" y="458" width="568" height="311"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="311" id="ydh-lJ-3jH"/>
                                                 </constraints>
@@ -70,35 +87,27 @@ Gorillas' natural habitats cover tropical or subtropical forests in Africa. Alth
                                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
-                                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="Source: Wikipedia" translatesAutoresizingMaskIntoConstraints="NO" id="2qL-VB-ErL">
-                                                <rect key="frame" x="16" y="741" width="568" height="36"/>
-                                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="height" constant="36" id="CGM-od-gzA"/>
-                                                </constraints>
-                                                <color key="textColor" red="0.42467236518859863" green="0.42467236518859863" blue="0.42467236518859863" alpha="1" colorSpace="calibratedRGB"/>
-                                                <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                                            </textView>
                                         </subviews>
-                                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>
                                             <constraint firstItem="Q4F-dQ-BiS" firstAttribute="leading" secondItem="hSa-1o-yF1" secondAttribute="leading" constant="16" id="000-wT-t7v"/>
+                                            <constraint firstItem="2qL-VB-ErL" firstAttribute="top" secondItem="Vrx-Kb-p6w" secondAttribute="bottom" constant="-28" id="2bK-pT-xzG"/>
                                             <constraint firstAttribute="trailing" secondItem="Vrx-Kb-p6w" secondAttribute="trailing" constant="16" id="3y3-mp-mgl"/>
+                                            <constraint firstAttribute="bottom" secondItem="RaR-xf-zE8" secondAttribute="bottom" constant="606" id="4U5-Ml-rkf"/>
                                             <constraint firstItem="Q4F-dQ-BiS" firstAttribute="top" secondItem="hSa-1o-yF1" secondAttribute="top" constant="8" id="4pE-Rx-cCc"/>
                                             <constraint firstAttribute="trailing" secondItem="IdK-dO-gJH" secondAttribute="trailing" constant="16" id="Bki-us-Hbp"/>
                                             <constraint firstAttribute="trailing" secondItem="oSt-NH-4YG" secondAttribute="trailing" constant="16" id="C2m-ia-8PP"/>
                                             <constraint firstItem="IdK-dO-gJH" firstAttribute="top" secondItem="Q4F-dQ-BiS" secondAttribute="bottom" constant="8" id="F5F-vf-nQR"/>
                                             <constraint firstItem="IdK-dO-gJH" firstAttribute="leading" secondItem="hSa-1o-yF1" secondAttribute="leading" constant="16" id="GPL-W0-EAk"/>
                                             <constraint firstAttribute="height" constant="1020" id="JWB-BV-3vn"/>
-                                            <constraint firstItem="2qL-VB-ErL" firstAttribute="top" secondItem="Vrx-Kb-p6w" secondAttribute="bottom" constant="8" id="M2P-Rn-Yjs"/>
+                                            <constraint firstItem="2qL-VB-ErL" firstAttribute="top" secondItem="Vrx-Kb-p6w" secondAttribute="bottom" constant="-28" id="M2P-Rn-Yjs"/>
                                             <constraint firstItem="2qL-VB-ErL" firstAttribute="leading" secondItem="hSa-1o-yF1" secondAttribute="leading" constant="16" id="MB9-2C-yW6"/>
+                                            <constraint firstItem="RaR-xf-zE8" firstAttribute="top" secondItem="oSt-NH-4YG" secondAttribute="bottom" constant="8" symbolic="YES" id="OJK-A4-jhg"/>
                                             <constraint firstItem="oSt-NH-4YG" firstAttribute="top" secondItem="IdK-dO-gJH" secondAttribute="bottom" constant="8" id="PXt-GS-vwz"/>
-                                            <constraint firstAttribute="trailing" secondItem="Ipc-WR-9VX" secondAttribute="trailing" constant="16" id="TTK-6p-bWL"/>
+                                            <constraint firstItem="RaR-xf-zE8" firstAttribute="trailing" secondItem="oSt-NH-4YG" secondAttribute="trailing" id="Sh4-qk-WcA"/>
+                                            <constraint firstItem="Vrx-Kb-p6w" firstAttribute="top" secondItem="RaR-xf-zE8" secondAttribute="bottom" constant="44" id="UCh-1C-YaI"/>
                                             <constraint firstAttribute="trailing" secondItem="Q4F-dQ-BiS" secondAttribute="trailing" constant="16" id="XbY-6X-Hkc"/>
-                                            <constraint firstItem="Ipc-WR-9VX" firstAttribute="leading" secondItem="hSa-1o-yF1" secondAttribute="leading" constant="16" id="gmL-Cz-07x"/>
-                                            <constraint firstItem="Ipc-WR-9VX" firstAttribute="top" secondItem="oSt-NH-4YG" secondAttribute="bottom" constant="8" id="ipC-o7-9g6"/>
-                                            <constraint firstItem="Vrx-Kb-p6w" firstAttribute="top" secondItem="Ipc-WR-9VX" secondAttribute="bottom" constant="8" id="qjV-GS-YYv"/>
+                                            <constraint firstItem="RaR-xf-zE8" firstAttribute="leading" secondItem="oSt-NH-4YG" secondAttribute="leading" id="bVV-Sa-o6H"/>
                                             <constraint firstAttribute="trailing" secondItem="2qL-VB-ErL" secondAttribute="trailing" constant="16" id="u6y-WX-l2t"/>
                                             <constraint firstItem="Vrx-Kb-p6w" firstAttribute="leading" secondItem="hSa-1o-yF1" secondAttribute="leading" constant="16" id="wCa-6J-8wC"/>
                                             <constraint firstItem="oSt-NH-4YG" firstAttribute="leading" secondItem="hSa-1o-yF1" secondAttribute="leading" constant="16" id="yd3-3g-JN3"/>
@@ -114,7 +123,7 @@ Gorillas' natural habitats cover tropical or subtropical forests in Africa. Alth
                                 </constraints>
                             </scrollView>
                         </subviews>
-                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="hSa-1o-yF1" firstAttribute="width" secondItem="4Ge-FZ-HvE" secondAttribute="width" id="05e-Yg-NiP"/>
                             <constraint firstItem="xSQ-Rm-Amy" firstAttribute="height" secondItem="4Ge-FZ-HvE" secondAttribute="height" id="Ao3-ua-LRh"/>
@@ -128,12 +137,12 @@ Gorillas' natural habitats cover tropical or subtropical forests in Africa. Alth
                     <size key="freeformSize" width="600" height="600"/>
                     <connections>
                         <outlet property="attributionTextView" destination="2qL-VB-ErL" id="5XO-iF-i3N"/>
-                        <outlet property="videoView" destination="Ipc-WR-9VX" id="KXG-G8-jTV"/>
+                        <outlet property="toolbar" destination="I4v-0O-4th" id="Ip6-gj-7Nh"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="M8l-7S-Avb" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1412" y="330"/>
+            <point key="canvasLocation" x="1411.875" y="329.57746478873241"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="hkk-Z3-2q8">
@@ -149,7 +158,25 @@ Gorillas' natural habitats cover tropical or subtropical forests in Africa. Alth
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Jcp-Zd-DVE" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="716" y="330.99999999999994"/>
+            <point key="canvasLocation" x="309" y="330"/>
+        </scene>
+        <!--Renderer View Controller-->
+        <scene sceneID="t1R-dO-mbk">
+            <objects>
+                <viewController id="4Si-nm-I01" customClass="GVRRendererViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="yd6-dd-ptm"/>
+                        <viewControllerLayoutGuide type="bottom" id="UDT-EM-1hs"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="Vc0-dw-w1e" customClass="GVRRendererView">
+                        <rect key="frame" x="0.0" y="0.0" width="568" height="250"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="98D-77-JTp" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2826" y="330"/>
         </scene>
     </scenes>
 </document>

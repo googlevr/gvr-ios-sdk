@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,14 @@
  * limitations under the License.
  */
 
-#import <UIKit/UIKit.h>
+#import "GVRTextureRenderer.h"
 
-@interface TreasureHuntViewController : UIViewController
+/** Defines a texture renderer for UIView renderer to pixel buffers. */
+@interface GVRUIViewRenderer : GVRTextureRenderer
+
+/** Initializes with the given view. */
+- (instancetype)initWithView:(UIView *)view;
+
+@property(nonatomic) UIView *view;
 
 @end

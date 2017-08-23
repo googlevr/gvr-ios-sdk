@@ -54,6 +54,13 @@ static const uint64_t kPredictionTimeWithoutVsyncNanos = 50000000;
 
 @implementation GVRRenderer
 
+- (instancetype)init {
+  if (self = [super init]) {
+    _headPose = [[GVRHeadPose alloc] init];
+  }
+  return self;
+}
+
 - (void)initializeGl {
   _gvrApi = gvr::GvrApi::Create();
   _gvrApi->InitializeGl();
@@ -64,7 +71,6 @@ static const uint64_t kPredictionTimeWithoutVsyncNanos = 50000000;
   _swapchain.reset(new gvr::SwapChain(_gvrApi->CreateSwapChain(specs)));
   _viewportList.reset(new gvr::BufferViewportList(_gvrApi->CreateEmptyBufferViewportList()));
 
-  _headPose = [[GVRHeadPose alloc] init];
   _headRotation = GLKMatrix4Identity;
 }
 

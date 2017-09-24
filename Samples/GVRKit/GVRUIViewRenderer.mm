@@ -128,6 +128,9 @@ static constexpr float kDefaultEpsilon = 1.0e-5f;
                                                CVPixelBufferGetBytesPerRow(_pixelBuffer),
                                                colorSpace,
                                                kCGImageAlphaPremultipliedLast);
+
+  CGContextClearRect(context, _view.bounds);
+
   CGColorSpaceRelease(colorSpace);
   NSAssert(context != NULL, @"Error creating bitmap context.");
 

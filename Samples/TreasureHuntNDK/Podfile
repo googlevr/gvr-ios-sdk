@@ -1,3 +1,4 @@
 target 'TreasureHuntNDK' do
   pod 'GVRSDK'
+  pod 'GVRAudioSDK'
 end

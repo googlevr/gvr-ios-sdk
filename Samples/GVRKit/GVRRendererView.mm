@@ -67,6 +67,9 @@ private:
     [self addGestureRecognizer:panGesture];
 
     self.context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES3];
+    if (self.context == nil) {
+        self.context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
+    }
     self.drawableDepthFormat = GLKViewDrawableDepthFormat16;
 
     [[NSNotificationCenter defaultCenter] addObserver:self

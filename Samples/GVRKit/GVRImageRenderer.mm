@@ -16,33 +16,37 @@
 
 #import "GVRImageRenderer.h"
 
+typedef void (^GVRTextureLoaderBlock)(GLKTextureLoaderCallback textureLoaderCallback);
+
 @implementation GVRImageRenderer {
-  dispatch_block_t _textureLoader;
+  GVRTextureLoaderBlock _textureLoader;
 }
 
 - (instancetype)initWithContentsOfFile:(NSString *)path {
   if (self = [super init]) {
     // Defer loading until the renderer is initialized.
-    __weak __typeof(self) weakSelf = self;
-    _textureLoader = ^{
+    _textureLoader = ^(GLKTextureLoaderCallback textureLoaderCallback) {
       GLKTextureLoader *loader =
           [[GLKTextureLoader alloc] initWithSharegroup:EAGLContext.currentContext.sharegroup];
       [loader textureWithContentsOfFile:path
                                 options:nil
                                   queue:NULL
-                      completionHandler:^(GLKTextureInfo *textureInfo, NSError *outError) {
-                        __strong __typeof(self) strongSelf = weakSelf;
-                        if (textureInfo) {
-                          // Allow non-power of 2 sized textures.
-                          glBindTexture(textureInfo.target, textureInfo.name);
-                          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                          glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-                          glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+                      completionHandler:textureLoaderCallback];
+    };
+  }
+  return self;
+}
 
-                          [strongSelf setImageTextureId:textureInfo.name];
-                        }
-                      }];
+- (instancetype)initWithContentsOfURL:(NSURL *)url {
+  if (self = [super init]) {
+    // Defer loading until the renderer is initialized.
+    _textureLoader = ^(GLKTextureLoaderCallback textureLoaderCallback) {
+      GLKTextureLoader *loader =
+          [[GLKTextureLoader alloc] initWithSharegroup:EAGLContext.currentContext.sharegroup];
+      [loader textureWithContentsOfURL:url
+                               options:nil
+                                 queue:NULL
+                     completionHandler:textureLoaderCallback];
     };
   }
   return self;
@@ -51,26 +55,13 @@
 - (instancetype)initWithImage:(UIImage *)image {
   if (self = [super init]) {
     // Defer loading until the renderer is initialized.
-    __weak __typeof(self) weakSelf = self;
-    _textureLoader = ^{
+    _textureLoader = ^(GLKTextureLoaderCallback textureLoaderCallback) {
       GLKTextureLoader *loader =
           [[GLKTextureLoader alloc] initWithSharegroup:EAGLContext.currentContext.sharegroup];
       [loader textureWithCGImage:image.CGImage
                          options:nil
                            queue:NULL
-               completionHandler:^(GLKTextureInfo *textureInfo, NSError *outError) {
-                 __strong __typeof(self) strongSelf = weakSelf;
-                 if (textureInfo) {
-                   // Allow non-power of 2 sized textures.
-                   glBindTexture(textureInfo.target, textureInfo.name);
-                   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-                   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-                   [strongSelf setImageTextureId:textureInfo.name];
-                 }
-               }];
+               completionHandler:textureLoaderCallback];
     };
   }
   return self;
@@ -82,7 +73,30 @@
   [super initializeGl];
   // Load the texture once GL is initialized.
   if (_textureLoader) {
-    _textureLoader();
+    __weak __typeof(self) weakSelf = self;
+    _textureLoader(^(GLKTextureInfo *textureInfo, NSError *error) {
+      __strong __typeof(self) strongSelf = weakSelf;
+      if (textureInfo) {
+        // Allow non-power of 2 sized textures.
+        glBindTexture(textureInfo.target, textureInfo.name);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+        [super setImageTextureId:textureInfo.name];
+
+        if ([strongSelf.loadDelegate
+                respondsToSelector:@selector(textureRenderer:didLoadTexture:)]) {
+          [strongSelf.loadDelegate textureRenderer:strongSelf didLoadTexture:textureInfo];
+        }
+      } else {
+        if ([strongSelf.loadDelegate
+                respondsToSelector:@selector(textureRenderer:failedToLoadTextureWithError:)]) {
+          [strongSelf.loadDelegate textureRenderer:strongSelf failedToLoadTextureWithError:error];
+        }
+      }
+    });
   }
 }
 

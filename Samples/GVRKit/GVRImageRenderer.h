@@ -16,13 +16,30 @@
 
 #import "GVRTextureRenderer.h"
 
+/** Defines a delegate that is called with result of loading a texture in |GVRImageRenderer|. */
+@protocol GVRTextureLoadDelegate<NSObject>
+@optional
+
+- (void)textureRenderer:(GVRTextureRenderer *)textureRenderer
+         didLoadTexture:(GLKTextureInfo *)textureInfo;
+
+- (void)textureRenderer:(GVRTextureRenderer *)textureRenderer
+    failedToLoadTextureWithError:(NSError *)error;
+
+@end
+
 /** Defines a texture renderer for images. */
 @interface GVRImageRenderer : GVRTextureRenderer
+
+@property(nonatomic, weak) id<GVRTextureLoadDelegate> loadDelegate;
 
 /** Initialize texture renderer from given image. */
 - (instancetype)initWithImage:(UIImage *)image;
 
 /** Initialize texture renderer from an image from the given path. */
 - (instancetype)initWithContentsOfFile:(NSString *)path;
+
+/** Initialize texture renderer from an image loaded from the given URL. */
+- (instancetype)initWithContentsOfURL:(NSURL *)url;
 
 @end

@@ -131,6 +131,8 @@ static constexpr float kDefaultEpsilon = 1.0e-5f;
   CGColorSpaceRelease(colorSpace);
   NSAssert(context != NULL, @"Error creating bitmap context.");
 
+  CGContextClearRect(context, _view.bounds);
+
   // Draw the view to the pixel buffer.
   [_view.layer renderInContext:context];
 

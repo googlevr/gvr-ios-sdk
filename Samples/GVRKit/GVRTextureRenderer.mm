@@ -220,6 +220,10 @@ static const char *kPassThroughVideoFragmentShaderString = R"(
 }
 
 - (void)update:(GVRHeadPose *)headPose {
+  // Enable support for textures with transparent background.
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
   if (_needsRebindVertexData) {
     _needsRebindVertexData = NO;
 
